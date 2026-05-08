@@ -1,4 +1,5 @@
 ---
+name: create-project
 description: Scaffold a new project with docs/, git hooks, and seed files from intake questions
 allowed-tools: Bash, Write, Read, Glob, Grep, AskUserQuestion
 ---

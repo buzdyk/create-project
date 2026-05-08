@@ -34,4 +34,16 @@ The skill treats the project as the docs first: specs come before code, and the 
 
 ## Installation
 
-Drop `create-project.md` into your Claude Code skills directory (e.g. `~/.claude/skills/create-project/`) and invoke with `/create-project` from inside an empty (or new) project directory.
+### Via `npx skills add` (recommended)
+
+```sh
+npx skills add buzdyk/create-project
+```
+
+This uses [vercel-labs/skills](https://github.com/vercel-labs/skills) to install `SKILL.md` into your Claude Code skills directory.
+
+### Manual
+
+Copy `SKILL.md` into your Claude Code skills directory (e.g. `~/.claude/skills/create-project/SKILL.md`).
+
+Invoke with `/create-project` from inside an empty (or new) project directory.
