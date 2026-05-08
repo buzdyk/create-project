@@ -2,7 +2,7 @@
 
 A Claude Code skill that scaffolds a new project's documentation tree, git hooks, and seed files from a four-question intake.
 
-The skill treats the project as the docs first: specs come before code, and the docs directory is the source of truth. Primary reader is [SilverBullet](https://silverbullet.md); Obsidian works as a secondary reader.
+The skill treats the project as the docs first: [specs come before code](https://buzdyk.dev/blog/spec-driven-development-with-ai/), and the docs directory is the source of truth. Primary reader is [SilverBullet](https://silverbullet.md); Obsidian works as a secondary reader.
 
 ## What it does
 
