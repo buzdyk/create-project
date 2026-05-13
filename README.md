@@ -8,17 +8,24 @@ The skill treats the project as the docs first: [specs come before code](https:/
 
 1. **Intake** — asks four questions (what, who for, MVP, tech decisions) in a single message.
 2. **Initializes git** if the directory isn't already a repo.
-3. **Creates the docs tree**:
+3. **Creates the docs tree** (folder indices live one level above the folder they index):
    ```
    docs/
    ├── README.md
    ├── GLOSSARY.md
    ├── LAUNCH.md
-   ├── adr/ADR.md
-   ├── devlog/DEVLOG.md
-   ├── reading/READING.md
+   ├── ADR.md         # indexes adr/
+   ├── DEVLOG.md      # indexes devlog/
+   ├── READING.md     # indexes reading/
+   ├── TEMPLATES.md   # indexes templates/
+   ├── TODOS.md       # summary of todos/ buckets
+   ├── adr/
+   ├── devlog/
+   ├── reading/
    ├── templates/{todo,adr,devlog}.md
-   └── todos/{active,backlog,completed,icebox}/
+   └── todos/
+       ├── ACTIVE.md  # + BACKLOG.md, COMPLETED.md, ICEBOX.md
+       └── {active,backlog,completed,icebox}/
    ```
 4. **Populates seed files** from intake answers — glossary terms, launch stages, first devlog, first ADRs (only when a clear rationale was given), initial todos.
 5. **Wires git hooks** — pre-commit regenerates the todos index from frontmatter; post-commit appends commit lines to the day's devlog entry.
@@ -26,7 +33,8 @@ The skill treats the project as the docs first: [specs come before code](https:/
 ## Conventions baked in
 
 - Wiki-link targets drop the `.md` suffix (SilverBullet convention).
-- Index files are `UPPERCASE.md` matching their directory; standalone docs are `SCREAMING_SNAKE_CASE.md`.
+- Index files are `UPPERCASE.md` matching their directory and live as a **sibling** of that directory (e.g. `docs/ADR.md` indexes `docs/adr/`); standalone docs are `SCREAMING_SNAKE_CASE.md`.
+- Don't repeat the folder name in the file — default is `folder-name/SPEC_NAME.md`, so an ADR is `adr/USER_AUTH.md`, not `adr/ADR_USER_AUTH.md`.
 - Every non-index file gets YAML frontmatter (`type`, `status`, `description`, etc.).
 - Todos move through `active → completed` (with commit references) or `active → icebox` (with a `reason:`).
 - ADRs are numbered, append-only — superseded ADRs get a note, never deleted.

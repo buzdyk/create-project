@@ -17,6 +17,16 @@ Ask the user these four questions **in a single message**. Wait for all answers 
 3. **What does the MVP look like?**
 4. **What tech decisions have you already made?**
 
+In the same message, list the defaults you'll apply unless they override them, and invite changes:
+
+> Defaults (say so if you'd like any of these changed before I scaffold):
+> - **Naming**: files inside a folder are `SPEC_NAME.md` — the folder name conveys the type, so no `adr-`/`active-` prefixes (`adr/USER_AUTH.md`, not `adr/ADR_USER_AUTH.md`).
+> - **Index location**: index files live as a **sibling** of the folder they index (`docs/ADR.md` indexes `docs/adr/`). Exception: `docs/README.md`.
+> - **Wiki links**: targets drop the `.md` suffix (SilverBullet convention).
+> - **Index style**: `UPPERCASE.md` matching the folder name.
+
+If the user overrides any default, apply that override consistently across the scaffold (tree, index file contents, link generation in `scripts/todos-index`, devlog wiki-link path) — don't leave the new project half-converted.
+
 ## Step 2: Initialize git
 
 If the current directory is not already a git repository, run `git init`.
@@ -25,27 +35,29 @@ If the current directory is not already a git repository, run `git init`.
 
 Create these directories and their index files. Do not create any other directories — they grow with the project.
 
+Index files live **one folder above** the folder they index — siblings of the folder, not inside it. The only exception is `docs/README.md`, which acts as the entry-point for the docs tree itself.
+
 ```
 docs/
-├── README.md
+├── README.md            # entry point for docs/
+├── ADR.md               # index of adr/
+├── DEVLOG.md            # index of devlog/
+├── READING.md           # index of reading/
+├── TEMPLATES.md         # index of templates/
+├── TODOS.md             # summary of todos/ buckets
 ├── adr/
-│   └── ADR.md
 ├── devlog/
-│   └── DEVLOG.md
 ├── reading/
-│   └── READING.md
 ├── templates/
-│   └── TEMPLATES.md
 └── todos/
-    ├── index.md
+    ├── ACTIVE.md        # index of active/
+    ├── BACKLOG.md       # index of backlog/
+    ├── COMPLETED.md     # index of completed/
+    ├── ICEBOX.md        # index of icebox/
     ├── active/
-    │   └── ACTIVE.md
     ├── backlog/
-    │   └── BACKLOG.md
     ├── completed/
-    │   └── COMPLETED.md
     └── icebox/
-        └── ICEBOX.md
 ```
 
 ### Index file content
@@ -65,17 +77,18 @@ Primary reader is [SilverBullet](https://silverbullet.md); Obsidian is a seconda
 
 - [GLOSSARY](./GLOSSARY) — shared vocabulary
 - [LAUNCH](./LAUNCH) — launch plan and stages
-- [adr/](./adr/ADR) — architecture decision records (numbered, append-only)
-- [devlog/](./devlog/DEVLOG) — daily dev log entries
-- [reading/](./reading/READING) — research notes
-- [templates/](./templates/TEMPLATES) — starter files
-- [todos/](./todos/) — `active/`, `backlog/`, `completed/`, `icebox/`
+- [ADR](./ADR) — architecture decision records (numbered, append-only) → `adr/`
+- [DEVLOG](./DEVLOG) — daily dev log entries → `devlog/`
+- [READING](./READING) — research notes → `reading/`
+- [TEMPLATES](./TEMPLATES) — starter files → `templates/`
+- [TODOS](./TODOS) — `active/`, `backlog/`, `completed/`, `icebox/` summary
 
 ## File Conventions
 
 ### Naming
 
-- Index files: `UPPERCASE.md` matching the directory name (e.g., `adr/ADR.md`)
+- Index files live **one folder above** the folder they index, named `UPPERCASE.md` matching the folder (e.g., `ADR.md` is the sibling of `adr/`, `ACTIVE.md` is the sibling of `active/`). The only exception is this `README.md`, which sits inside `docs/`.
+- **Don't repeat the folder name in the file.** The path already conveys the type. Default pattern is `folder-name/SPEC_NAME.md` — files inside `adr/` are named `USER_AUTH.md`, not `adr-user-auth.md` or `adr/ADR_USER_AUTH.md`.
 - Standalone todos and docs: `SCREAMING_SNAKE_CASE.md`
 - Numbered items inside epics: `01-SHORT_NAME.md`, `02-SHORT_NAME.md`
 - Devlog entries: `YYYY/MM_MMM/DD.md` (e.g., `2026/04_APR/19.md`)
@@ -112,7 +125,7 @@ date: 2026-02-25                                    # devlog entries only
 3. **Deferred work** moves to `todos/icebox/` with a `reason:` frontmatter field.
 4. **Future ideas** go straight to `todos/backlog/`.
 
-The indexes (`ACTIVE.md`, `BACKLOG.md`, `ICEBOX.md`, `COMPLETED.md`, `todos/index.md`) are regenerated from frontmatter by `scripts/todos-index`, wired into the pre-commit hook.
+The indexes (`todos/ACTIVE.md`, `todos/BACKLOG.md`, `todos/ICEBOX.md`, `todos/COMPLETED.md`, and `TODOS.md`) are regenerated from frontmatter by `scripts/todos-index`, wired into the pre-commit hook.
 
 ## Devlog
 
@@ -160,12 +173,12 @@ Starter files for common document types.
 
 | Template | Usage |
 |----------|-------|
-| [todo](./todo) | New task or work item |
-| [adr](./adr) | Architecture decision record |
-| [devlog](./devlog) | Daily dev log entry |
+| [todo](./templates/todo) | New task or work item |
+| [adr](./templates/adr) | Architecture decision record |
+| [devlog](./templates/devlog) | Daily dev log entry |
 ```
 
-**todos/index.md** — summary populated by `scripts/todos-index`:
+**TODOS.md** (at `docs/TODOS.md`, sibling of `todos/`) — bucket summary populated by `scripts/todos-index`:
 ```markdown
 # Todos
 
@@ -303,10 +316,10 @@ date: YYYY-MM-DD
 - (auto-populated by post-commit hook)
 ```
 
-Add a row to `DEVLOG.md` using the nested wiki-link path (no `.md`):
+Add a row to `docs/DEVLOG.md` using the nested wiki-link path (no `.md`), prefixed with `devlog/` since `DEVLOG.md` now lives one level above the `devlog/` folder:
 
 ```
-| YYYY-MM-DD | [[YYYY/MM_MMM/DD]] | Initialized project docs |
+| YYYY-MM-DD | [[devlog/YYYY/MM_MMM/DD]] | Initialized project docs |
 ```
 
 ### First ADR(s)
@@ -427,7 +440,7 @@ The `-m` flag already skips `prepare-commit-msg` (git doesn't invoke it when a m
 
 ### scripts/todos-index
 
-Regenerates todo index tables from per-file YAML frontmatter. Rewrites only the region between `<!-- GENERATED:START -->` and `<!-- GENERATED:END -->` in each folder's index file plus `todos/index.md`.
+Regenerates todo index tables from per-file YAML frontmatter. Each per-bucket index sits one folder above its bucket (`docs/todos/ACTIVE.md` indexes `docs/todos/active/`, etc.), and the overall summary sits one folder above `todos/` (`docs/TODOS.md`). The script rewrites only the region between `<!-- GENERATED:START -->` and `<!-- GENERATED:END -->`.
 
 ```bash
 #!/bin/bash
@@ -435,7 +448,8 @@ Regenerates todo index tables from per-file YAML frontmatter. Rewrites only the 
 # Regenerate todo index tables from per-file YAML frontmatter.
 # Reads: docs/todos/{active,backlog,icebox,completed}/*.md
 # Writes: the region between <!-- GENERATED:START --> and <!-- GENERATED:END -->
-# inside each folder's index file and the top-level docs/todos/index.md summary.
+# inside each bucket's sibling index file (docs/todos/ACTIVE.md, etc.) and the
+# top-level docs/TODOS.md summary.
 #
 # Each todo file's frontmatter should look like:
 #   ---
@@ -448,7 +462,8 @@ Regenerates todo index tables from per-file YAML frontmatter. Rewrites only the 
 set -e
 
 ROOT="$(git rev-parse --show-toplevel)"
-TODOS_DIR="$ROOT/docs/todos"
+DOCS_DIR="$ROOT/docs"
+TODOS_DIR="$DOCS_DIR/todos"
 
 extract_field() {
     local file="$1" field="$2"
@@ -475,7 +490,8 @@ extract_field() {
 
 generate_index() {
     local dir="$1" index_file="$2" kind="$3"
-    local header rows="" f base type desc status reason
+    local bucket header rows="" f base type desc status reason
+    bucket=$(basename "$dir")
 
     case "$kind" in
         active)
@@ -495,7 +511,6 @@ generate_index() {
     shopt -s nullglob
     for f in "$dir"/*.md; do
         base=$(basename "$f" .md)
-        [ "$f" = "$index_file" ] && continue
         type=$(extract_field "$f" "type")
         [ -z "$type" ] && continue
 
@@ -503,14 +518,14 @@ generate_index() {
         case "$kind" in
             active)
                 status=$(extract_field "$f" "status")
-                rows+="| [$base](./$base.md) | $desc | $status |"$'\n'
+                rows+="| [$base](./$bucket/$base.md) | $desc | $status |"$'\n'
                 ;;
             backlog|completed)
-                rows+="| [$base](./$base.md) | $desc |"$'\n'
+                rows+="| [$base](./$bucket/$base.md) | $desc |"$'\n'
                 ;;
             icebox)
                 reason=$(extract_field "$f" "reason")
-                rows+="| [$base](./$base.md) | $desc | $reason |"$'\n'
+                rows+="| [$base](./$bucket/$base.md) | $desc | $reason |"$'\n'
                 ;;
         esac
     done
@@ -550,7 +565,6 @@ count_items() {
     local dir="$1" f type n=0
     shopt -s nullglob
     for f in "$dir"/*.md; do
-        [ "$f" = "$dir/$(basename "$dir" | tr '[:lower:]' '[:upper:]').md" ] && continue
         type=$(extract_field "$f" "type")
         [ -n "$type" ] && n=$((n + 1))
     done
@@ -558,7 +572,7 @@ count_items() {
 }
 
 generate_summary() {
-    local index_file="$TODOS_DIR/index.md"
+    local index_file="$DOCS_DIR/TODOS.md"
     local active_n backlog_n icebox_n completed_n
     active_n=$(count_items "$TODOS_DIR/active")
     backlog_n=$(count_items "$TODOS_DIR/backlog")
@@ -568,10 +582,10 @@ generate_summary() {
     local header rows
     header=$'| Bucket | Description | Count |\n|--------|-------------|-------|'
     rows=""
-    rows+="| [Active](./active/ACTIVE.md) | Work in progress or queued for the current cycle | $active_n |"$'\n'
-    rows+="| [Backlog](./backlog/BACKLOG.md) | Future work, not yet scheduled | $backlog_n |"$'\n'
-    rows+="| [Icebox](./icebox/ICEBOX.md) | Deferred indefinitely | $icebox_n |"$'\n'
-    rows+="| [Completed](./completed/COMPLETED.md) | Archive of finished work | $completed_n |"$'\n'
+    rows+="| [Active](./todos/ACTIVE.md) | Work in progress or queued for the current cycle | $active_n |"$'\n'
+    rows+="| [Backlog](./todos/BACKLOG.md) | Future work, not yet scheduled | $backlog_n |"$'\n'
+    rows+="| [Icebox](./todos/ICEBOX.md) | Deferred indefinitely | $icebox_n |"$'\n'
+    rows+="| [Completed](./todos/COMPLETED.md) | Archive of finished work | $completed_n |"$'\n'
 
     if [ ! -f "$index_file" ]; then
         echo "warning: $index_file does not exist, skipping" >&2
@@ -603,10 +617,10 @@ generate_summary() {
     echo "updated $index_file"
 }
 
-generate_index "$TODOS_DIR/active"    "$TODOS_DIR/active/ACTIVE.md"       active
-generate_index "$TODOS_DIR/backlog"   "$TODOS_DIR/backlog/BACKLOG.md"     backlog
-generate_index "$TODOS_DIR/icebox"    "$TODOS_DIR/icebox/ICEBOX.md"       icebox
-generate_index "$TODOS_DIR/completed" "$TODOS_DIR/completed/COMPLETED.md" completed
+generate_index "$TODOS_DIR/active"    "$TODOS_DIR/ACTIVE.md"    active
+generate_index "$TODOS_DIR/backlog"   "$TODOS_DIR/BACKLOG.md"   backlog
+generate_index "$TODOS_DIR/icebox"    "$TODOS_DIR/ICEBOX.md"    icebox
+generate_index "$TODOS_DIR/completed" "$TODOS_DIR/COMPLETED.md" completed
 generate_summary
 ```
 
@@ -627,11 +641,11 @@ fi
 "$ROOT/scripts/todos-index" > /dev/null
 
 for f in \
-    docs/todos/index.md \
-    docs/todos/active/ACTIVE.md \
-    docs/todos/backlog/BACKLOG.md \
-    docs/todos/icebox/ICEBOX.md \
-    docs/todos/completed/COMPLETED.md
+    docs/TODOS.md \
+    docs/todos/ACTIVE.md \
+    docs/todos/BACKLOG.md \
+    docs/todos/ICEBOX.md \
+    docs/todos/COMPLETED.md
 do
     if [ -f "$ROOT/$f" ] && ! git diff --quiet -- "$ROOT/$f"; then
         git add "$ROOT/$f"
@@ -724,7 +738,8 @@ set -e
 [ "${SKIP_AI_HOOKS:-}" = "1" ] && exit 0
 
 AI_CMD="${AI_CMD:-claude -p}"
-DEVLOG_DIR="$(git rev-parse --show-toplevel)/docs/devlog"
+DOCS_DIR="$(git rev-parse --show-toplevel)/docs"
+DEVLOG_DIR="${DOCS_DIR}/devlog"
 DATE_FULL=$(date +"%Y-%m-%d")
 DATE_DISPLAY=$(date +"%b %d")
 
@@ -736,8 +751,8 @@ ENTRY_DIR="${DEVLOG_DIR}/${YEAR}/${MONTH_DIR}"
 mkdir -p "$ENTRY_DIR"
 FILE_PATH="${ENTRY_DIR}/${DAY}.md"
 
-# Wiki link path for DEVLOG.md index (relative to devlog/)
-WIKI_LINK="${YEAR}/${MONTH_DIR}/${DAY}"
+# Wiki link path for DEVLOG.md index (relative to docs/, since DEVLOG.md lives at docs/DEVLOG.md)
+WIKI_LINK="devlog/${YEAR}/${MONTH_DIR}/${DAY}"
 
 # Get today's commits
 TODAYS_COMMITS=$(git log --since="midnight" --pretty=format:"- %h %s" --reverse)
@@ -792,7 +807,7 @@ ${TODAYS_COMMITS}
 EOF
 
 # Update DEVLOG.md if this date isn't already listed
-INDEX_FILE="${DEVLOG_DIR}/DEVLOG.md"
+INDEX_FILE="${DOCS_DIR}/DEVLOG.md"
 if [ -f "$INDEX_FILE" ] && ! grep -q "\[\[${WIKI_LINK}\]\]" "$INDEX_FILE"; then
     SHORT_DESC=$($AI_CMD "Summarize this in under 10 words for a table cell, no period at end:
 ${SUMMARY}" 2>/dev/null || echo "Daily work log")
